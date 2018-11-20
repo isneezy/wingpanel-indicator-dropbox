@@ -19,6 +19,7 @@
 public class Dropbox.Indicator : Wingpanel.Indicator {
   private Wingpanel.Widgets.OverlayIcon? indicator_icon = null;
   private Dropbox.Widgets.PopoverWidget? popover_wigdet = null;
+  private Dropbox.Services.Service service = null;
 
   public Indicator () {
     debug("Hello from wingpanel-indicator-dropbox");
@@ -31,11 +32,12 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
 
   construct {
     visible = true;
+    service = new Dropbox.Services.Service ();
   }
 
   public override Gtk.Widget get_display_widget () {
     if(indicator_icon == null) {
-      indicator_icon = new Wingpanel.Widgets.OverlayIcon ("dropboxstatus-x");
+      indicator_icon = new Wingpanel.Widgets.OverlayIcon (service.is_dropbox_running () ? "dropboxstatus-idle" : "dropboxstatus-x");
     }
 
     indicator_icon.button_press_event.connect ((e) => {

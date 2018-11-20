@@ -20,8 +20,11 @@ shared_module(
     meson.project_name(),
     'src/Indicator.vala',
     'src/Widgets/PopoverWidget.vala',
+    'src/Services/Dropbox.vala',
     dependencies: [
         dependency('gtk+-3.0'),
+        dependency('glib-2.0'),
+        dependency('gio-2.0'),
         wingpanel_dep
     ],
     install: true,
