@@ -62,7 +62,7 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
 
   public bool update () {
     if (indicator_icon != null) {
-      indicator_icon.set_main_icon_name (service.is_dropbox_running () ? "dropboxstatus-idle" : "dropboxstatus-x");
+      indicator_icon.set_main_icon_name (service.is_dropbox_running () ? "dropboxstatus-logo" : "dropboxstatus-x");
     }
     return true;
   }
