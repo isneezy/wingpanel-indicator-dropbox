@@ -33,6 +33,7 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
   construct {
     visible = true;
     service = new Dropbox.Services.Service ();
+    GLib.Timeout.add(2000, update);
   }
 
   public override Gtk.Widget get_display_widget () {
@@ -58,6 +59,13 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
   public override void opened () {}
 
   public override void closed () {}
+
+  public bool update () {
+    if (indicator_icon != null) {
+      indicator_icon.set_main_icon_name (service.is_dropbox_running () ? "dropboxstatus-idle" : "dropboxstatus-x");
+    }
+    return true;
+  }
 }
 
 /*
