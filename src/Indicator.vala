@@ -35,7 +35,7 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
 
   public override Gtk.Widget get_display_widget () {
     if(indicator_icon == null) {
-      indicator_icon = new Wingpanel.Widgets.OverlayIcon ("dialog-information-symbolic");
+      indicator_icon = new Wingpanel.Widgets.OverlayIcon ("dropboxstatus-x");
     }
 
     indicator_icon.button_press_event.connect ((e) => {

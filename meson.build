@@ -1,24 +1,38 @@
 # project name and programming language
-project('com.github.isneezy.wingpanel-indicator-dropbox', 'vala', 'c')
+project(
+  'com.github.isneezy.wingpanel-indicator-dropbox',
+  'vala', 'c',
+  version: '0.1.0'
+)
 
-# Create a new executable, list the files we want to compile, list the dependencies we need, and install
-executable(
+prefix = get_option('prefix')
+datadir = join_paths(prefix, get_option('datadir'))
+
+gettext_name = meson.project_name() + '-indicator'
+gnome = import('gnome')
+i18n = import('i18n')
+
+add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format(gettext_name), language:'c')
+
+wingpanel_dep = dependency('wingpanel-2.0')
+
+shared_module(
     meson.project_name(),
-    'src/Application.vala',
+    'src/Indicator.vala',
+    'src/Widgets/PopoverWidget.vala',
     dependencies: [
-        dependency('gtk+-3.0')
+        dependency('gtk+-3.0'),
+        wingpanel_dep
     ],
-    install: true
+    install: true,
+    install_dir: wingpanel_dep.get_pkgconfig_variable('indicatorsdir')
 )
 
-# Install our .desktop file so the Applications Menu will see it
-install_data(
-    join_paths('data', meson.project_name() + '.desktop'),
-    install_dir: join_paths(get_option('datadir'), 'applications')
-)
 
 #Install our .appdata.xml file so AppCenter will see it
 install_data(
     join_paths('data', meson.project_name() + '.appdata.xml'),
     install_dir: join_paths(get_option('datadir'), 'metainfo')
 )
+
+subdir('icons')
