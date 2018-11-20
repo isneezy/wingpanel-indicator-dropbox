@@ -20,9 +20,9 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
   private Wingpanel.Widgets.OverlayIcon? indicator_icon = null;
   private Dropbox.Widgets.PopoverWidget? popover_wigdet = null;
   private Dropbox.Services.Service service = null;
+  private int dropbox_status = -1;
 
   public Indicator () {
-    debug("Hello from wingpanel-indicator-dropbox");
     Object (
       code_name: "wingpanel-indicator-dropbox",
       display_name: _("Dropbox"),
@@ -38,7 +38,7 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
 
   public override Gtk.Widget get_display_widget () {
     if(indicator_icon == null) {
-      indicator_icon = new Wingpanel.Widgets.OverlayIcon (service.is_dropbox_running () ? "dropboxstatus-idle" : "dropboxstatus-x");
+      indicator_icon = new Wingpanel.Widgets.OverlayIcon ("dropboxstatus-x");
     }
 
     indicator_icon.button_press_event.connect ((e) => {
@@ -61,8 +61,27 @@ public class Dropbox.Indicator : Wingpanel.Indicator {
   public override void closed () {}
 
   public bool update () {
+    dropbox_status = service.get_dropbox_status ();
     if (indicator_icon != null) {
-      indicator_icon.set_main_icon_name (service.is_dropbox_running () ? "dropboxstatus-logo" : "dropboxstatus-x");
+      string icon_name = "dropboxstatus-x";
+      switch (dropbox_status) {
+        case Dropbox.Services.Service.DROP_BOX_STATUS_UNKNOWN:
+          icon_name = "dropboxstatus-x";
+          break;
+
+        case Dropbox.Services.Service.DROP_BOX_STATUS_STOPPED:
+          icon_name = "dropboxstatus-x";
+          break;
+
+        case Dropbox.Services.Service.DROP_BOX_STATUS_SYNCING:
+          icon_name = "dropboxstatus-busy";
+          break;
+
+        case Dropbox.Services.Service.DROP_BOX_STATUS_UPTODATE:
+          icon_name = "dropboxstatus-idle";
+          break;
+      }
+      indicator_icon.set_main_icon_name (icon_name);
     }
     return true;
   }

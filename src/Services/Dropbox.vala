@@ -17,6 +17,11 @@
 */
 
 public class Dropbox.Services.Service {
+  public const int DROP_BOX_STATUS_UNKNOWN = -1;
+  public const int DROP_BOX_STATUS_STOPPED = 0;
+  public const int DROP_BOX_STATUS_SYNCING = 1;
+  public const int DROP_BOX_STATUS_UPTODATE = 2;
+
   public Service () {}
 
   private string get_pid_file_path () {
@@ -44,13 +49,54 @@ public class Dropbox.Services.Service {
     var proc_file = File.new_for_path("/proc/" + get_pid() + "/cmdline");
     return proc_file.query_exists ();
   }
+
+  public int get_dropbox_status () {
+    int status = DROP_BOX_STATUS_UNKNOWN;
+
+    if (is_dropbox_running()) {
+
+      string dropbox_stdout;
+      string dropbox_stderr;
+      int dropbox_status;
+
+      try {
+        Process.spawn_command_line_sync ("dropbox status",
+          out dropbox_stdout,
+          out dropbox_stderr,
+          out dropbox_status);
+
+        dropbox_stdout = dropbox_stdout.split("\n")[0];
+        switch (dropbox_stdout) {
+          case "Up to date":
+            status = DROP_BOX_STATUS_UPTODATE;
+            break;
+
+         case "Connecting...":
+           status = DROP_BOX_STATUS_SYNCING;
+           break;
+
+         case "Starting...":
+           status = DROP_BOX_STATUS_SYNCING;
+           break;
+
+         case "Checking for changes...":
+           status = DROP_BOX_STATUS_SYNCING;
+           break;
+        }
+
+        if (dropbox_stdout.has_prefix ("Syncing")) {
+          status = DROP_BOX_STATUS_SYNCING;
+        } else if (dropbox_stdout.has_prefix ("Indexing")) {
+          status = DROP_BOX_STATUS_SYNCING;
+        }
+      } catch (SpawnError e) {}
+    }
+
+    return status;
+  }
 }
 
 // void main (string[] args) {
 //   Dropbox.Services.Service service = new Dropbox.Services.Service ();
-//   if (service.is_dropbox_running()) {
-//     stdout.printf ("Dropbox is running!\n");
-//   } else {
-//     stderr.printf ("Dropbox is'nt running!\n");
-//   }
+//   print("status: %d\n", service.get_dropbox_status());
 // }
