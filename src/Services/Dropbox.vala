@@ -23,21 +23,26 @@ public class Dropbox.Services.Service {
     return GLib.Environment.get_home_dir () + "/.dropbox/dropbox.pid";
   }
 
-  public bool is_dropbox_running () {
+  private string get_pid () {
     string pid;
     var pid_file = File.new_for_path(get_pid_file_path());
     if (!pid_file.query_exists ()) {
-      return false;
+      return "";
     }
     try {
         FileInputStream @is = pid_file.read ();
         DataInputStream dis = new DataInputStream (@is);
         pid = dis.read_line ();
-        return pid != null;
+        return pid;
     } catch (Error e) {
       debug("Error " + e.message);
-      return false;
+      return "";
     }
+  }
+
+  public bool is_dropbox_running () {
+    var proc_file = File.new_for_path("/proc/" + get_pid() + "/cmdline");
+    return proc_file.query_exists ();
   }
 }
 
